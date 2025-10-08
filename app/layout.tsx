@@ -32,9 +32,7 @@ export default function RootLayout({
       >
         <Theme>
           <Navbar />
-          <main className="flex items-center justify-between flex-col ">
-            {children}
-          </main>
+          <main className="p-4">{children}</main>
         </Theme>
       </body>
     </html>
