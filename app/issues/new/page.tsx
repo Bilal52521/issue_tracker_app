@@ -10,6 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { issueSchema } from "@/app/validationSchemas";
 import { z } from "zod";
 import ErrorMessage from "@/app/components/ErrorMessage";
+import Spinner from "@/app/components/Spinner";
 
 type IssueForm = z.infer<typeof issueSchema>;
 
@@ -24,10 +25,9 @@ const newIssuePage = () => {
     resolver: zodResolver(issueSchema),
   });
 
-
-  
   const router = useRouter();
   const [errorapi, setErrorapi] = useState("");
+  const [iSubmit, setSubmit] = useState(false);
 
   const onSubmit = async (data: IssueForm) => {
     if (!data.title.trim() || !data.description.trim()) {
@@ -38,6 +38,7 @@ const newIssuePage = () => {
     }
 
     try {
+      setSubmit(true);
       const response = await fetch("/api/issues", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -55,6 +56,7 @@ const newIssuePage = () => {
       reset();
       router.push("/issues");
     } catch (error) {
+      setSubmit(false);
       console.error("Network Error:", error);
       setErrorapi("Something went wrong. Please try again later.");
     }
@@ -78,7 +80,9 @@ const newIssuePage = () => {
             <SimpleMDE placeholder="Description here..." {...field} />
           )}
         />
-        <Button type="submit">Submit New Issue</Button>
+        <Button disabled={iSubmit} type="submit">
+          Submit New Issue {iSubmit && <Spinner />}
+        </Button>
       </form>
     </div>
   );
