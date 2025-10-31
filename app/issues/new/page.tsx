@@ -1,25 +1,35 @@
 "use client";
 
-import { Button, Callout, TextField } from "@radix-ui/themes";
+import { Button, Callout, Text, TextField } from "@radix-ui/themes";
 import SimpleMDE from "react-simplemde-editor";
 import "easymde/dist/easymde.min.css";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { issueSchema } from "@/app/validationSchemas";
+import { z } from "zod";
 
-interface IssueForm {
-  title: string;
-  description: string;
-}
+type IssueForm = z.infer<typeof issueSchema>;
 
 const newIssuePage = () => {
-  const { register, control, handleSubmit, reset } = useForm<IssueForm>();
+  const {
+    register,
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<IssueForm>({
+    resolver: zodResolver(issueSchema),
+  });
   const router = useRouter();
   const [errorapi, setErrorapi] = useState("");
 
   const onSubmit = async (data: IssueForm) => {
     if (!data.title.trim() || !data.description.trim()) {
-      setErrorapi("Please fill in both title and description before submitting.");
+      setErrorapi(
+        "Please fill in both title and description before submitting."
+      );
       return;
     }
 
@@ -54,7 +64,17 @@ const newIssuePage = () => {
         </Callout.Root>
       )}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+        {errors.title && (
+          <Text color="red" as="p">
+            {errors.title.message}
+          </Text>
+        )}
         <TextField.Root placeholder="Title" {...register("title")} />
+        {errors.description && (
+          <Text color="red" as="p">
+            {errors.description.message}
+          </Text>
+        )}
         <Controller
           name="description"
           control={control}
