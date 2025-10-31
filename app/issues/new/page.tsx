@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { issueSchema } from "@/app/validationSchemas";
 import { z } from "zod";
+import ErrorMessage from "@/app/components/ErrorMessage";
 
 type IssueForm = z.infer<typeof issueSchema>;
 
@@ -22,6 +23,9 @@ const newIssuePage = () => {
   } = useForm<IssueForm>({
     resolver: zodResolver(issueSchema),
   });
+
+
+  
   const router = useRouter();
   const [errorapi, setErrorapi] = useState("");
 
@@ -64,17 +68,9 @@ const newIssuePage = () => {
         </Callout.Root>
       )}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
-        {errors.title && (
-          <Text color="red" as="p">
-            {errors.title.message}
-          </Text>
-        )}
+        <ErrorMessage>{errors.title?.message}</ErrorMessage>
         <TextField.Root placeholder="Title" {...register("title")} />
-        {errors.description && (
-          <Text color="red" as="p">
-            {errors.description.message}
-          </Text>
-        )}
+        <ErrorMessage>{errors.description?.message}</ErrorMessage>
         <Controller
           name="description"
           control={control}
